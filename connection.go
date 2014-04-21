@@ -30,8 +30,8 @@ func (c *WebsocketConn) Write(msg []byte) error {
     return c.ws.WriteMessage(websocket.TextMessage, msg)
 }
 
-func (c *WebsocketConn) Close() {
-    c.ws.Close()
+func (c *WebsocketConn) Close() error {
+    return c.ws.Close()
 }
 
 type SocketConn struct {
@@ -79,6 +79,6 @@ func (c *SocketConn) fullWrite(msg []byte) error {
     return err
 }
 
-func (c *SocketConn) Close() {
-    c.sock.Close()
+func (c *SocketConn) Close() error {
+    return c.sock.Close()
 }
