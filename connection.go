@@ -10,7 +10,7 @@ import (
 type Connection interface {
     Read() ([]byte, error)
     Write(msg []byte) error
-    Close()
+    Close() error
 }
 
 type WebsocketConn struct {
