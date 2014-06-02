@@ -27,7 +27,7 @@ func (c *SocketConn) Read() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	size, _ := binary.Uvarint(sizeBuf)
+	size := binary.LittleEndian.Uint32(sizeBuf)
 	msgBuf := make([]byte, size)
 	_, err = io.ReadFull(c.sock, msgBuf)
 	return msgBuf, err
@@ -36,7 +36,7 @@ func (c *SocketConn) Read() ([]byte, error) {
 func (c *SocketConn) Write(msg []byte) error {
 	lenBuf := make([]byte, 4)
 	msgLen := len(msg)
-	binary.PutUvarint(lenBuf, uint64(msgLen))
+	binary.LittleEndian.PutUint32(lenBuf, uint32(msgLen))
 	err := c.fullWrite(lenBuf)
 	if err != nil {
 		return err
