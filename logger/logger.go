@@ -62,7 +62,7 @@ func setupLoggerWrapper(path string, context string) {
 		logfile := os.Stdout
 		SetupLogger(context, DEBUG, USUAL, logfile)
 	} else {
-		reallog, err := os.Create(path)
+		reallog, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 		if err != nil {
 			panic(err)
 		}
