@@ -25,8 +25,9 @@ const (
 )
 
 type LevelLogger struct {
-	logger *log.Logger
-	level  Level
+	logger  *log.Logger
+	level   Level
+	context string
 }
 
 var logs LevelLogger
@@ -35,30 +36,44 @@ func init() {
 	logs.level = DEBUG
 }
 
-func SetupLogger(lev Level, flags Flags, w io.Writer) {
+func SetupLogger(context string, lev Level, flags Flags, w io.Writer) {
 	logs.logger = log.New(w, "", int(flags))
 	logs.level = lev
+	if context != "" {
+		logs.context = context + ": "
+	} else {
+		logs.context = ""
+	}
+}
+
+func SetupLoggerHelperContext(path string, context string) {
+	setupLoggerWrapper(path, context)
 }
 
 func SetupLoggerHelper(path string) {
+	setupLoggerWrapper(path, "")
+}
+
+func setupLoggerWrapper(path string, context string) {
 	if strings.Contains(path, "/dev/stderr") {
 		logfile := os.Stderr
-		SetupLogger(DEBUG, USUAL, logfile)
+		SetupLogger(context, DEBUG, USUAL, logfile)
 	} else if strings.Contains(path, "dev/stdout") {
 		logfile := os.Stdout
-		SetupLogger(DEBUG, USUAL, logfile)
+		SetupLogger(context, DEBUG, USUAL, logfile)
 	} else {
 		reallog, err := os.Create(path)
 		if err != nil {
 			panic(err)
 		}
-		SetupLogger(DEBUG, USUAL, reallog)
+		SetupLogger(context, DEBUG, USUAL, reallog)
 	}
 }
 
 func logIfLevelf(level Level, format string, v ...interface{}) {
 	if int(level) >= int(logs.level) {
-		logs.logger.Printf(format, v...)
+		fullFormat := logs.context + format
+		logs.logger.Printf(fullFormat, v...)
 	}
 }
 
